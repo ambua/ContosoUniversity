@@ -28,12 +28,9 @@ namespace ContosoUniversity.Controllers
                   .Include(i => i.OfficeAssignment)
                   .Include(i => i.Courses)
                     .ThenInclude(i => i.Course)
-                        .ThenInclude(i => i.Enrollments)
-                            .ThenInclude(i => i.Student)
                   .Include(i => i.Courses)
                     .ThenInclude(i => i.Course)
                         .ThenInclude(i => i.Department)
-                  .AsNoTracking()
                   .OrderBy(i => i.LastName)
                   .ToListAsync();
 
@@ -48,6 +45,9 @@ namespace ContosoUniversity.Controllers
             if (courseID != null)
             {
                 ViewData["CourseID"] = courseID.Value;
+                _context.Enrollments
+                    .Include(i => i.Student)
+                    .Where(c => c.CourseID == courseID.Value).Load();
                 viewModel.Enrollments = viewModel.Courses.Where(
                     x => x.CourseID == courseID).Single().Enrollments;
             }
